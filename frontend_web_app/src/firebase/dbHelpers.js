@@ -1,37 +1,25 @@
 import {
   ref,
-  push,
-  set,
-  get,
   onValue,
+  set,
   update,
-  remove
+  get,
 } from "firebase/database";
 
-// PUBLIC_INTERFACE
-export const createRoom = async (realtimeDb, hostUsername) => {
-  const roomRef = push(ref(realtimeDb, "rooms"));
-  const roomId = roomRef.key;
-  const newRoom = {
-    roomId,
-    host: hostUsername,
-    users: {
-      [hostUsername]: {
-        username: hostUsername,
-        score: 0,
-        joinedAt: Date.now()
-      }
-    },
-    phase: "waiting", // waiting, drawing, guessing, voting, results
-    createdAt: Date.now()
-  };
-  await set(roomRef, newRoom);
-  return roomId;
-};
+/**
+ * PUBLIC_INTERFACE
+ * All real-time multiplayer state is now global (no rooms/lobby).
+ * Exposes helpers to manage the global game session for all connected users.
+ */
 
-// PUBLIC_INTERFACE
-export const joinRoom = async (realtimeDb, roomId, username) => {
-  const userRef = ref(realtimeDb, `rooms/${roomId}/users/${username}`);
+const GLOBAL_GAME_ID = "global-session";
+
+/**
+ * PUBLIC_INTERFACE
+ * Join the global game session. Creates the user entry (if not present).
+ */
+export const joinGlobalSession = async (realtimeDb, username) => {
+  const userRef = ref(realtimeDb, `sessions/${GLOBAL_GAME_ID}/users/${username}`);
   await set(userRef, {
     username,
     score: 0,
@@ -39,8 +27,13 @@ export const joinRoom = async (realtimeDb, roomId, username) => {
   });
 };
 
-export const listenRoom = (realtimeDb, roomId, onUpdate) => {
-  const unsub = onValue(ref(realtimeDb, `rooms/${roomId}`), (snap) => {
+/**
+ * PUBLIC_INTERFACE
+ * Listen for updates to the global game session.
+ * Callback receives the session object ({ users, phase, ... }).
+ */
+export const listenGlobalSession = (realtimeDb, onUpdate) => {
+  const unsub = onValue(ref(realtimeDb, `sessions/${GLOBAL_GAME_ID}`), (snap) => {
     if (snap.exists()) {
       onUpdate(snap.val());
     }
@@ -48,13 +41,21 @@ export const listenRoom = (realtimeDb, roomId, onUpdate) => {
   return () => unsub();
 };
 
-// PUBLIC_INTERFACE
-export const updateRoom = async (realtimeDb, roomId, data) => {
-  const roomRef = ref(realtimeDb, `rooms/${roomId}`);
-  await update(roomRef, data);
+/**
+ * PUBLIC_INTERFACE
+ * Update global session data (stage state, phase progression, etc.)
+ */
+export const updateGlobalSession = async (realtimeDb, data) => {
+  const sessionRef = ref(realtimeDb, `sessions/${GLOBAL_GAME_ID}`);
+  await update(sessionRef, data);
 };
 
-// PUBLIC_INTERFACE
-export const removeRoom = async (realtimeDb, roomId) => {
-  await remove(ref(realtimeDb, `rooms/${roomId}`));
+/**
+ * PUBLIC_INTERFACE
+ * Get the current global session state.
+ */
+export const getGlobalSession = async (realtimeDb) => {
+  const sessionRef = ref(realtimeDb, `sessions/${GLOBAL_GAME_ID}`);
+  const snap = await get(sessionRef);
+  return snap.exists() ? snap.val() : null;
 };

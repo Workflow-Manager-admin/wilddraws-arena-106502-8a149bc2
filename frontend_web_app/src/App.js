@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import LoginScreen from "./components/LoginScreen";
-import LobbyScreen from "./components/LobbyScreen";
-import RoomScreen from "./components/RoomScreen";
-import WinnerScreen from "./components/WinnerScreen";
+import MainGameScreen from "./components/MainGameScreen";
 import { FirebaseProvider } from "./firebase/FirebaseContext";
 
-// PUBLIC_INTERFACE
+/**
+ * PUBLIC_INTERFACE
+ * App component with NO room/lobby logic; all users are in a single global game session.
+ */
 function App() {
   const [username, setUsername] = useState(() => localStorage.getItem("doodle-username") || "");
 
@@ -28,31 +29,15 @@ function App() {
             <Route
               path="/"
               element={
-                username ? <Navigate to="/lobby" replace /> :
+                username ? <Navigate to="/play" replace /> :
                   <LoginScreen onLogin={setUsername} />
               }
             />
             <Route
-              path="/lobby"
+              path="/play"
               element={
                 username ?
-                  <LobbyScreen username={username} /> :
-                  <Navigate to="/" replace />
-              }
-            />
-            <Route
-              path="/room/:roomId"
-              element={
-                username ?
-                  <RoomScreen username={username} /> :
-                  <Navigate to="/" replace />
-              }
-            />
-            <Route
-              path="/winner/:roomId"
-              element={
-                username ?
-                  <WinnerScreen username={username} /> :
+                  <MainGameScreen username={username} /> :
                   <Navigate to="/" replace />
               }
             />
