@@ -90,9 +90,13 @@ function MainGameScreen({ username }) {
 
       const unsub = listenGlobalSession(realtimeDb, (sess) => {
         setSession(sess);
-        setPhase(sess?.phase || "waiting");
-        setDrawingWord(sess?.currentWord || "");
-        if (sess?.phase === "results" && sess.winner) setWinner(sess.winner);
+
+        // Only update phase if it has changed, to avoid unnecessary re-renders.
+        setPhase(prevPhase => (sess?.phase && sess.phase !== prevPhase ? sess.phase : prevPhase));
+        // Only update drawingWord if it has changed
+        setDrawingWord(prevWord => (sess?.currentWord && sess.currentWord !== prevWord ? sess.currentWord : prevWord));
+        // Only update winner if we are in results and winner is set and it has changed
+        setWinner(prevWinner => (sess?.phase === "results" && sess.winner && JSON.stringify(sess.winner) !== JSON.stringify(prevWinner)) ? sess.winner : (sess?.phase !== "results" ? null : prevWinner));
         appendDebugUI("listenGlobalSession update/snapshot", { phase: sess?.phase, keys: Object.keys(sess?.users ?? {}), uname: username });
       });
       return () => {
