@@ -22,7 +22,7 @@ function App() {
     <FirebaseProvider>
       <Router>
         <div className="App">
-          <header className="app-header" style={{ background: "var(--bg-secondary)" }}>
+          <header className="App-header" style={{ background: "var(--bg-secondary)" }}>
             <h1 className="game-title">🎨 Doodle Finder</h1>
           </header>
           <Routes>
