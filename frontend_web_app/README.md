@@ -27,6 +27,39 @@ Launches the test runner in interactive watch mode.
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
+## Firebase Configuration (Required!)
+
+This project uses Firebase for real-time multiplayer features.  
+**You must create a `.env` file with your Firebase secrets for the app to run.**
+
+**If you see the following error on startup:**  
+`FIREBASE FATAL ERROR: Cannot parse Firebase url. Please use https://<YOUR FIREBASE>.firebaseio.com`  
+it means you have not set up your Firebase configuration.
+
+### Setup Steps
+
+1. Copy the sample environment file:
+   ```
+   cp .env.example .env
+   ```
+2. Go to the [Firebase Console](https://console.firebase.google.com/), select your project, and navigate to **Project Settings > General**.
+3. Fill in all the keys in `.env` with your real Firebase values.
+
+   - `REACT_APP_FIREBASE_DB_URL` should look like:  
+     ```
+     https://your-project-id.firebaseio.com
+     ```
+     **No angle brackets or placeholder text!**
+
+4. Restart the React app after editing `.env`:
+   ```
+   npm start
+   ```
+
+5. Do **not** commit `.env` with real secrets.
+
+---
+
 ## Customization
 
 ### Colors
