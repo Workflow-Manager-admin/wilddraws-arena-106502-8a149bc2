@@ -22,24 +22,29 @@ function App() {
     <FirebaseProvider>
       <Router>
         <div className="App">
+          {/* Header should show, but the main content should be the routed content */}
           <header className="App-header" style={{ background: "var(--bg-secondary)" }}>
             <h1 className="game-title">🎨 Doodle Finder</h1>
           </header>
+          {/* Routing for login/main game screens */}
           <Routes>
             <Route
               path="/"
-              element={
-                username ? <Navigate to="/play" replace /> :
-                  <LoginScreen onLogin={setUsername} />
-              }
+              element={(
+                username
+                  ? <Navigate to="/play" replace />
+                  : <LoginScreen onLogin={name => {
+                      setUsername(name);
+                    }} />
+              )}
             />
             <Route
               path="/play"
-              element={
-                username ?
-                  <MainGameScreen username={username} /> :
-                  <Navigate to="/" replace />
-              }
+              element={(
+                username
+                  ? <MainGameScreen username={username} />
+                  : <Navigate to="/" replace />
+              )}
             />
             <Route
               path="*"
