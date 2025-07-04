@@ -22,27 +22,51 @@ function App() {
     <FirebaseProvider>
       <Router>
         <div className="App">
-          {/* Header should show, but the main content should be the routed content */}
-          <header className="App-header" style={{ background: "var(--bg-secondary)" }}>
-            <h1 className="game-title">🎨 Doodle Finder</h1>
-          </header>
           {/* Routing for login/main game screens */}
           <Routes>
             <Route
               path="/"
               element={(
-                username
-                  ? <Navigate to="/play" replace />
-                  : <LoginScreen onLogin={name => {
-                      setUsername(name);
-                    }} />
+                !username
+                  ? <LoginScreen onLogin={name => setUsername(name)} />
+                  : <Navigate to="/play" replace />
               )}
             />
             <Route
               path="/play"
               element={(
                 username
-                  ? <MainGameScreen username={username} />
+                  ? (
+                      <>
+                        {/* Header *only* inside game, not on login */}
+                        <header className="App-header" style={{ background: "var(--bg-secondary)" }}>
+                          <h1 className="game-title">🎨 Doodle Finder</h1>
+                          {/* Optional Logout for easier flow testing */}
+                          <button
+                            style={{
+                              position: "absolute",
+                              top: 16,
+                              right: 24,
+                              background: "#fff3f3",
+                              color: "#e74c3c",
+                              border: "1px solid #ffdada",
+                              borderRadius: 8,
+                              padding: "6px 16px",
+                              fontWeight: 700,
+                              cursor: "pointer"
+                            }}
+                            onClick={() => {
+                              setUsername("");
+                              localStorage.removeItem("doodle-username");
+                            }}
+                            aria-label="Logout"
+                          >
+                            Logout
+                          </button>
+                        </header>
+                        <MainGameScreen username={username} />
+                      </>
+                    )
                   : <Navigate to="/" replace />
               )}
             />
